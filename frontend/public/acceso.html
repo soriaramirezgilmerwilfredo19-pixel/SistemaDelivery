@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso · Sistema Delivery</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #e85d04, #d00000);
+        padding: 1.5rem; color: #212529;
+      }
+      .card {
+        background: #fff; border-radius: 22px; padding: 2rem 2rem 1.6rem;
+        max-width: 420px; width: 100%; text-align: center;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      }
+      .logo { font-size: 2.6rem; line-height: 1; }
+      h1 { font-size: 1.35rem; margin: 0.6rem 0 0.2rem; }
+      .sub { color: #6c757d; font-size: 0.9rem; margin: 0 0 1.2rem; }
+      .qr-box {
+        display: inline-block; padding: 14px; border: 1px solid #e9ecef;
+        border-radius: 16px; background: #fff;
+      }
+      #qr { display: block; width: 260px; height: 260px; }
+      .link {
+        display: block; margin: 1.1rem 0 0.4rem; font-weight: 800;
+        font-size: 1.05rem; color: #e85d04; text-decoration: none;
+        word-break: break-all;
+      }
+      .btn {
+        display: inline-block; margin-top: 0.9rem; padding: 0.75rem 1.4rem;
+        border: none; border-radius: 12px; cursor: pointer; color: #fff;
+        font-size: 0.95rem; font-weight: 700; text-decoration: none;
+        background: linear-gradient(135deg, #e85d04, #d00000);
+        box-shadow: 0 10px 22px rgba(232,93,4,0.35);
+      }
+      .btn.secondary {
+        background: #f1f3f5; color: #212529; box-shadow: none;
+        border: 1px solid #e9ecef; margin-left: 0.4rem;
+      }
+      .note {
+        margin-top: 1.1rem; font-size: 0.8rem; color: #6c757d; line-height: 1.4;
+      }
+      .warn { color: #d00000; font-weight: 700; }
+      .actions { margin-top: 0.8rem; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="logo">🛵🍔</div>
+      <h1>Sistema Delivery</h1>
+      <p class="sub">Escanea el código con tu celular para entrar</p>
+      <div class="qr-box">
+        <img id="qr" alt="Código QR de acceso" />
+      </div>
+      <a id="link" class="link" href="#"></a>
+      <div class="actions">
+        <a id="open" class="btn" href="#">Abrir la aplicación</a>
+        <button id="copy" class="btn secondary" type="button">Copiar link</button>
+      </div>
+      <p id="note" class="note"></p>
+    </main>
+
+    <script>
+      (function () {
+        var host = location.hostname || 'localhost';
+        var url = 'http://' + host + ':5173/';
+        document.getElementById('qr').src =
+          'https://api.qrserver.com/v1/create-qr-code/?size=520x520&margin=10&data=' +
+          encodeURIComponent(url);
+        var link = document.getElementById('link');
+        link.textContent = url;
+        link.href = url;
+        document.getElementById('open').href = url;
+
+        var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+        var note = document.getElementById('note');
+        if (isLocal) {
+          note.innerHTML =
+            '<span class="warn">Estás viendo esto en localhost.</span><br />' +
+            'Para que el celular pueda escanearlo, abre esta página en la PC con la IP de tu red ' +
+            '(<b>http://192.168.1.49:5173/acceso.html</b>) o simplemente usa el link de arriba reemplazando ' +
+            '<b>localhost</b> por tu IP.';
+        } else {
+          note.textContent =
+            'Solo funciona si el celular está en la misma red Wi-Fi que esta PC.';
+        }
+
+        document.getElementById('copy').addEventListener('click', function () {
+          var btn = this;
+          navigator.clipboard.writeText(url).then(
+            function () { btn.textContent = '¡Copiado!'; setTimeout(function () { btn.textContent = 'Copiar link'; }, 1500); },
+            function () { btn.textContent = url; }
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>
